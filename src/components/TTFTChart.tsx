@@ -9,9 +9,14 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
+import type { BenchmarkRun } from "../types/benchmark";
 import { MODEL_COLORS, shortModelName } from "./chartConfig";
 
-export default function TTFTChart({ run }) {
+interface TTFTChartProps {
+  run: BenchmarkRun | null;
+}
+
+export default function TTFTChart({ run }: TTFTChartProps) {
   if (!run) return null;
 
   const data = Object.values(run.overall)
@@ -61,7 +66,7 @@ export default function TTFTChart({ run }) {
             }}
             labelStyle={{ color: "#e5e7eb" }}
             itemStyle={{ color: "#e5e7eb" }}
-            formatter={(value) => [`${value.toLocaleString()}ms`, "TTFT"]}
+            formatter={(value) => [`${Number(value).toLocaleString()}ms`, "TTFT"]}
           />
           <ReferenceLine
             x={1000}

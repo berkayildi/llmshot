@@ -8,10 +8,16 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import type { BenchmarkRun, MeetingTypeData } from "../types/benchmark";
 import { shortModelName } from "./chartConfig";
 
-export default function QualityChart({ run, data }) {
-  const source = data || (run ? run.overall : null);
+interface QualityChartProps {
+  run?: BenchmarkRun;
+  data?: MeetingTypeData;
+}
+
+export default function QualityChart({ run, data }: QualityChartProps) {
+  const source = data ?? (run ? run.overall : null);
   if (!source) return null;
 
   const chartData = Object.values(source).map((m) => ({
@@ -23,7 +29,7 @@ export default function QualityChart({ run, data }) {
   return (
     <div>
       <h3 className="text-xs uppercase tracking-wider text-gray-500 mb-3">
-        Quality Scores (0–1)
+        Quality Scores (0\u20131)
       </h3>
       <ResponsiveContainer width="100%" height={280}>
         <BarChart

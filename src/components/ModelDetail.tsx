@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import type { BenchmarkRun, BenchmarkResult, SummaryData } from "../types/benchmark";
 import { loadBenchmarkDetail } from "../utils/dataLoader";
 import {
   formatLatency,
@@ -7,7 +8,12 @@ import {
 } from "../utils/formatters";
 import { MODEL_COLORS, shortModelName } from "./chartConfig";
 
-function StatRow({ label, value }) {
+interface StatRowProps {
+  label: string;
+  value: string | number;
+}
+
+function StatRow({ label, value }: StatRowProps) {
   return (
     <div className="flex justify-between py-1.5 border-b border-gray-800/50">
       <span className="text-gray-500 text-xs">{label}</span>
@@ -16,7 +22,12 @@ function StatRow({ label, value }) {
   );
 }
 
-function MeetingTypeStats({ model, byMeetingType }) {
+interface MeetingTypeStatsProps {
+  model: string;
+  byMeetingType: SummaryData;
+}
+
+function MeetingTypeStats({ model, byMeetingType }: MeetingTypeStatsProps) {
   const types = Object.keys(byMeetingType);
 
   return (
@@ -67,7 +78,11 @@ function MeetingTypeStats({ model, byMeetingType }) {
   );
 }
 
-function QuestionResults({ results }) {
+interface QuestionResultsProps {
+  results: BenchmarkResult[];
+}
+
+function QuestionResults({ results }: QuestionResultsProps) {
   if (!results || results.length === 0) {
     return <p className="text-gray-600 text-xs">No detailed results available.</p>;
   }
@@ -117,7 +132,13 @@ function QuestionResults({ results }) {
   );
 }
 
-export default function ModelDetail({ model, run, onClose }) {
+interface ModelDetailProps {
+  model: string;
+  run: BenchmarkRun | null;
+  onClose: () => void;
+}
+
+export default function ModelDetail({ model, run, onClose }: ModelDetailProps) {
   const overallStats = run?.overall?.[model];
   const color = MODEL_COLORS[model] || "#6b7280";
 
@@ -131,7 +152,7 @@ export default function ModelDetail({ model, run, onClose }) {
     return detail.results.filter((r) => r.model === model);
   }, [detail, model]);
 
-  if (!model || !overallStats) return null;
+  if (!model || !run || !overallStats) return null;
 
   return (
     <>

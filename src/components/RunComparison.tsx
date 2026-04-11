@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import type { BenchmarkRun, ModelStats } from "../types/benchmark";
 import {
   formatLatency,
   formatCost,
@@ -6,7 +7,14 @@ import {
   formatTimestamp,
 } from "../utils/formatters";
 
-const METRICS = [
+interface ComparisonMetric {
+  key: keyof ModelStats;
+  label: string;
+  format: (value: number) => string;
+  better: "lower" | "higher" | null;
+}
+
+const METRICS: ComparisonMetric[] = [
   { key: "avg_ttft_ms", label: "TTFT", format: formatLatency, better: "lower" },
   { key: "avg_latency_ms", label: "Latency", format: formatLatency, better: "lower" },
   { key: "avg_input_tokens", label: "In Tokens", format: (v) => Math.round(v).toLocaleString(), better: null },
@@ -16,7 +24,13 @@ const METRICS = [
   { key: "avg_relevance", label: "Relevance", format: formatScore, better: "higher" },
 ];
 
-function DeltaCell({ oldVal, newVal, metric }) {
+interface DeltaCellProps {
+  oldVal: number | undefined;
+  newVal: number | undefined;
+  metric: ComparisonMetric;
+}
+
+function DeltaCell({ oldVal, newVal, metric }: DeltaCellProps) {
   if (oldVal == null || newVal == null) return <span className="text-gray-600">--</span>;
   const diff = newVal - oldVal;
   if (Math.abs(diff) < 0.0001) return <span className="text-gray-600">--</span>;
@@ -29,7 +43,7 @@ function DeltaCell({ oldVal, newVal, metric }) {
   const arrow = diff > 0 ? "\u2191" : "\u2193";
   const color = improved === true ? "text-emerald-400" : improved === false ? "text-red-400" : "text-gray-500";
 
-  let formatted;
+  let formatted: string;
   if (metric.key.includes("cost")) {
     formatted = `${diff > 0 ? "+" : ""}$${diff.toFixed(4)}`;
   } else if (metric.key.includes("faithfulness") || metric.key.includes("relevance")) {
@@ -47,7 +61,13 @@ function DeltaCell({ oldVal, newVal, metric }) {
   );
 }
 
-function ModelRow({ model, runA, runB }) {
+interface ModelRowProps {
+  model: string;
+  runA: BenchmarkRun | null;
+  runB: BenchmarkRun | null;
+}
+
+function ModelRow({ model, runA, runB }: ModelRowProps) {
   const statsA = runA?.overall?.[model];
   const statsB = runB?.overall?.[model];
 
@@ -62,7 +82,7 @@ function ModelRow({ model, runA, runB }) {
         </td>
         {METRICS.map((m) => (
           <td key={`a-${m.key}`} className="px-2 py-1.5 text-right text-xs tabular-nums text-gray-400 font-mono whitespace-nowrap">
-            {statsA ? m.format(statsA[m.key]) : <span className="text-gray-700">--</span>}
+            {statsA ? m.format(statsA[m.key] as number) : <span className="text-gray-700">--</span>}
           </td>
         ))}
       </tr>
@@ -71,12 +91,12 @@ function ModelRow({ model, runA, runB }) {
           <td key={`b-${m.key}`} className="px-2 py-1.5 text-right text-xs tabular-nums whitespace-nowrap">
             <div className="flex items-center justify-end gap-2">
               <span className="text-gray-300 font-mono">
-                {statsB ? m.format(statsB[m.key]) : <span className="text-gray-700">--</span>}
+                {statsB ? m.format(statsB[m.key] as number) : <span className="text-gray-700">--</span>}
               </span>
               <span className="text-[10px] min-w-[70px] text-right">
                 <DeltaCell
-                  oldVal={statsA?.[m.key]}
-                  newVal={statsB?.[m.key]}
+                  oldVal={statsA?.[m.key] as number | undefined}
+                  newVal={statsB?.[m.key] as number | undefined}
                   metric={m}
                 />
               </span>
@@ -88,12 +108,20 @@ function ModelRow({ model, runA, runB }) {
   );
 }
 
-export default function RunComparison({ runs, idxA, idxB, onChangeA, onChangeB }) {
-  const runA = runs[idxA] ?? null;
-  const runB = runs[idxB] ?? null;
+interface RunComparisonProps {
+  runs: BenchmarkRun[];
+  idxA: number;
+  idxB: number;
+  onChangeA: (idx: number) => void;
+  onChangeB: (idx: number) => void;
+}
+
+export default function RunComparison({ runs, idxA, idxB, onChangeA, onChangeB }: RunComparisonProps) {
+  const runA: BenchmarkRun | null = runs[idxA] ?? null;
+  const runB: BenchmarkRun | null = runs[idxB] ?? null;
 
   const allModels = useMemo(() => {
-    const set = new Set();
+    const set = new Set<string>();
     if (runA) for (const m of runA.models) set.add(m);
     if (runB) for (const m of runB.models) set.add(m);
     return [...set];

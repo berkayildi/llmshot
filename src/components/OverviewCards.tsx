@@ -1,6 +1,13 @@
+import type { BenchmarkRun } from "../types/benchmark";
 import { formatCost } from "../utils/formatters";
 
-function Card({ label, value, sub }) {
+interface CardProps {
+  label: string;
+  value: string | number;
+  sub?: string;
+}
+
+function Card({ label, value, sub }: CardProps) {
   return (
     <div className="bg-gray-800/50 border border-gray-700/50 rounded-lg px-5 py-4">
       <p className="text-[11px] uppercase tracking-wider text-gray-500 mb-1">
@@ -14,7 +21,11 @@ function Card({ label, value, sub }) {
   );
 }
 
-export default function OverviewCards({ run }) {
+interface OverviewCardsProps {
+  run: BenchmarkRun | null;
+}
+
+export default function OverviewCards({ run }: OverviewCardsProps) {
   if (!run) return null;
 
   const elapsed =

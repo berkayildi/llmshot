@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import type { BenchmarkRun } from "../types/benchmark";
 import { loadAllRuns } from "../utils/dataLoader";
 import { formatTimestamp } from "../utils/formatters";
 import OverviewCards from "./OverviewCards";
@@ -18,12 +19,12 @@ const TABS = [
 
 export default function BenchmarkDashboard() {
   const runs = useMemo(() => loadAllRuns(), []);
-  const [activeTab, setActiveTab] = useState("latest");
+  const [activeTab, setActiveTab] = useState<"latest" | "trends">("latest");
   const [selectedIdx, setSelectedIdx] = useState(runs.length - 1);
-  const [selectedModel, setSelectedModel] = useState(null);
+  const [selectedModel, setSelectedModel] = useState<string | null>(null);
   const [compareA, setCompareA] = useState(0);
   const [compareB, setCompareB] = useState(runs.length - 1);
-  const run = runs[selectedIdx] ?? null;
+  const run: BenchmarkRun | null = runs[selectedIdx] ?? null;
 
   if (runs.length === 0) {
     return (
@@ -75,7 +76,7 @@ export default function BenchmarkDashboard() {
             {TABS.map((tab) => (
               <button
                 key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
+                onClick={() => setActiveTab(tab.key as "latest" | "trends")}
                 className={`px-4 pb-3 text-xs uppercase tracking-wider font-medium cursor-pointer transition-colors ${
                   activeTab === tab.key
                     ? "text-gray-100 border-b-2 border-blue-500"
@@ -101,7 +102,7 @@ export default function BenchmarkDashboard() {
               <h2 className="text-xs uppercase tracking-wider text-gray-500 mb-3">
                 Model Comparison
               </h2>
-              <ComparisonTable run={run} onModelClick={setSelectedModel} />
+              <ComparisonTable run={run ?? undefined} onModelClick={setSelectedModel} />
             </section>
 
             {/* Charts row */}
@@ -115,7 +116,7 @@ export default function BenchmarkDashboard() {
             </div>
 
             <section className="bg-gray-900/50 border border-gray-800/50 rounded-lg p-4">
-              <QualityChart run={run} />
+              <QualityChart run={run ?? undefined} />
             </section>
 
             {/* Meeting type breakdown */}

@@ -9,10 +9,18 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import type { BenchmarkRun, ModelStats } from "../types/benchmark";
 import { MODEL_COLORS, shortModelName } from "./chartConfig";
 import { formatTimestamp } from "../utils/formatters";
 
-const METRICS = [
+interface TrendMetric {
+  key: keyof ModelStats;
+  label: string;
+  format: (v: number) => string;
+  domain?: [number, number];
+}
+
+const METRICS: TrendMetric[] = [
   { key: "avg_ttft_ms", label: "TTFT (ms)", format: (v) => `${Math.round(v).toLocaleString()}ms` },
   { key: "avg_latency_ms", label: "Latency (ms)", format: (v) => `${Math.round(v).toLocaleString()}ms` },
   { key: "avg_faithfulness", label: "Faithfulness", format: (v) => v.toFixed(3), domain: [0, 1] },
@@ -20,12 +28,16 @@ const METRICS = [
   { key: "avg_cost_per_query", label: "Cost / Query", format: (v) => `$${v.toFixed(4)}` },
 ];
 
-export default function TrendChart({ runs }) {
+interface TrendChartProps {
+  runs: BenchmarkRun[];
+}
+
+export default function TrendChart({ runs }: TrendChartProps) {
   const [metricIdx, setMetricIdx] = useState(0);
-  const metric = METRICS[metricIdx];
+  const metric = METRICS[metricIdx]!;
 
   const allModels = useMemo(() => {
-    const set = new Set();
+    const set = new Set<string>();
     for (const run of runs) {
       for (const m of run.models) set.add(m);
     }
@@ -34,10 +46,10 @@ export default function TrendChart({ runs }) {
 
   const data = useMemo(() => {
     return runs.map((run) => {
-      const point = { ts: formatTimestamp(run.timestamp) };
+      const point: Record<string, string | number | null> = { ts: formatTimestamp(run.timestamp) };
       for (const model of allModels) {
         const stats = run.overall[model];
-        point[model] = stats ? stats[metric.key] : null;
+        point[model] = stats ? (stats[metric.key] as number) : null;
       }
       return point;
     });
@@ -75,11 +87,11 @@ export default function TrendChart({ runs }) {
             tickLine={false}
           />
           <YAxis
-            domain={metric.domain || ["auto", "auto"]}
+            domain={metric.domain ?? ["auto", "auto"]}
             tick={{ fill: "#9ca3af", fontSize: 10 }}
             axisLine={false}
             tickLine={false}
-            tickFormatter={metric.format}
+            tickFormatter={(v: number) => metric.format(v)}
           />
           <Tooltip
             contentStyle={{
@@ -90,13 +102,13 @@ export default function TrendChart({ runs }) {
             }}
             labelStyle={{ color: "#e5e7eb", fontFamily: "monospace", fontSize: 11 }}
             formatter={(value, name) => [
-              value != null ? metric.format(value) : "n/a",
-              shortModelName(name),
+              value != null ? metric.format(Number(value)) : "n/a",
+              shortModelName(String(name)),
             ]}
           />
           <Legend
             wrapperStyle={{ fontSize: 11, color: "#9ca3af" }}
-            formatter={(value) => shortModelName(value)}
+            formatter={(value) => shortModelName(String(value))}
           />
           {allModels.map((model) => (
             <Line

@@ -9,6 +9,7 @@ import {
   Legend,
   Tooltip,
 } from "recharts";
+import type { BenchmarkRun } from "../types/benchmark";
 import ComparisonTable from "./ComparisonTable";
 import QualityChart from "./QualityChart";
 import { MODEL_COLORS, shortModelName } from "./chartConfig";
@@ -19,35 +20,23 @@ const MEETING_TYPES = [
   { key: "discovery", label: "Discovery" },
 ];
 
-function RadarOverview({ run }) {
+interface RadarOverviewProps {
+  run: BenchmarkRun;
+}
+
+function RadarOverview({ run }: RadarOverviewProps) {
   const models = run.models;
   const types = Object.keys(run.byMeetingType);
 
   const radarData = useMemo(() => {
-    const points = [];
-    for (const type of types) {
-      const typeData = run.byMeetingType[type];
-      const point = { meeting: type.toUpperCase() };
-      for (const model of models) {
-        const stats = typeData[model];
-        if (stats) {
-          point[`${model}_faith`] = stats.avg_faithfulness ?? 0;
-          point[`${model}_rel`] = stats.avg_relevance ?? 0;
-        }
-      }
-      points.push(point);
-    }
-
-    // Build two points per meeting type: one for faithfulness, one for relevance
-    // Actually, let's build axes as: "ADR Faith", "ADR Rel", "Sprint Faith", etc.
-    const axes = [];
+    const axes: Array<{ axis: string; type: string; metric: "avg_faithfulness" | "avg_relevance" }> = [];
     for (const type of types) {
       axes.push({ axis: `${type.toUpperCase()} Faith.`, type, metric: "avg_faithfulness" });
       axes.push({ axis: `${type.toUpperCase()} Rel.`, type, metric: "avg_relevance" });
     }
 
     return axes.map((a) => {
-      const row = { axis: a.axis };
+      const row: Record<string, string | number> = { axis: a.axis };
       for (const model of models) {
         const stats = run.byMeetingType[a.type]?.[model];
         row[model] = stats?.[a.metric] ?? 0;
@@ -59,7 +48,7 @@ function RadarOverview({ run }) {
   return (
     <div>
       <h3 className="text-xs uppercase tracking-wider text-gray-500 mb-3">
-        Quality Across Meeting Types — Generalist vs Specialist
+        Quality Across Meeting Types &mdash; Generalist vs Specialist
       </h3>
       <ResponsiveContainer width="100%" height={380}>
         <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="72%">
@@ -103,12 +92,17 @@ function RadarOverview({ run }) {
   );
 }
 
-export default function MeetingTypeBreakdown({ run, onModelClick }) {
+interface MeetingTypeBreakdownProps {
+  run: BenchmarkRun | null;
+  onModelClick: (model: string) => void;
+}
+
+export default function MeetingTypeBreakdown({ run, onModelClick }: MeetingTypeBreakdownProps) {
   const [activeTab, setActiveTab] = useState("adr");
 
   if (!run || !run.byMeetingType) return null;
 
-  const tabData = run.byMeetingType[activeTab] || null;
+  const tabData = run.byMeetingType[activeTab] ?? null;
 
   return (
     <div className="space-y-6">

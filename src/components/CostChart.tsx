@@ -8,15 +8,20 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
+import type { BenchmarkRun } from "../types/benchmark";
 import { MODEL_COLORS, shortModelName } from "./chartConfig";
 
-function formatTick(value) {
+function formatTick(value: number): string {
   if (value >= 0.01) return `$${value.toFixed(2)}`;
   if (value >= 0.001) return `$${value.toFixed(3)}`;
   return `$${value.toFixed(4)}`;
 }
 
-export default function CostChart({ run }) {
+interface CostChartProps {
+  run: BenchmarkRun | null;
+}
+
+export default function CostChart({ run }: CostChartProps) {
   if (!run) return null;
 
   const data = Object.values(run.overall)
@@ -64,7 +69,7 @@ export default function CostChart({ run }) {
               fontSize: 12,
             }}
             labelStyle={{ color: "#e5e7eb" }}
-            formatter={(value) => [`$${value.toFixed(4)}`, "Cost/Query"]}
+            formatter={(value) => [`$${Number(value).toFixed(4)}`, "Cost/Query"]}
           />
           <Bar dataKey="cost" radius={[3, 3, 0, 0]} barSize={32}>
             {data.map((entry) => (
