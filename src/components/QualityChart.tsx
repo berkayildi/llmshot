@@ -29,7 +29,7 @@ export default function QualityChart({ run, data }: QualityChartProps) {
   return (
     <div>
       <h3 className="text-xs uppercase tracking-wider text-gray-500 mb-3">
-        Quality Scores (0\u20131)
+        Quality Scores (0-1)
       </h3>
       <ResponsiveContainer width="100%" height={280}>
         <BarChart
