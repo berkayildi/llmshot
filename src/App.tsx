@@ -19,13 +19,15 @@ function App() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-300">
+    <div className="flex flex-col min-h-screen bg-gray-950 text-gray-300">
       <TopNav route={route} />
-      {domainEntry ? (
-        <DomainDashboard domainId={domainEntry.id} />
-      ) : (
-        <LandingPage />
-      )}
+      <main className="flex-1">
+        {domainEntry ? (
+          <DomainDashboard domainId={domainEntry.id} />
+        ) : (
+          <LandingPage />
+        )}
+      </main>
       <footer className="border-t border-gray-800 mt-8">
         <div className="max-w-[1400px] mx-auto px-6 py-4 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600">
           {GLOBAL_SOURCES.map((s) => (
