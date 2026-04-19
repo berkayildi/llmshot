@@ -12,9 +12,12 @@ export default function TopNav({ route }: TopNavProps) {
       <div className="max-w-[1400px] mx-auto px-6 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <a
           href="#/"
-          className="text-base font-semibold text-gray-100 tracking-tight hover:text-white"
+          className="flex items-center text-base font-semibold text-gray-100 tracking-tight hover:text-white"
         >
           LLMShot
+          <span className="text-[10px] text-gray-600 font-mono ml-2">
+            v{__APP_VERSION__}
+          </span>
         </a>
         <nav className="flex items-center gap-1 flex-wrap">
           {Object.values(DOMAINS).map((d) => {
