@@ -1,10 +1,15 @@
 # LLMShot
 
+[![Version](https://img.shields.io/github/v/release/berkayildi/llmshot)](https://github.com/berkayildi/llmshot/releases)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 **LLM performance · quality · cost analysis**
 
 Multi-domain benchmark dashboard comparing LLM models across providers.
 
 Live: [llmshot.vercel.app](https://llmshot.vercel.app)
+
+![LLMShot preview](.github/assets/llmshot-preview.png)
 
 ## Domains
 
