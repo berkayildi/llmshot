@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/berkayildi/llmshot/compare/llmshot-v0.1.2...llmshot-v0.1.3) (2026-04-19)
+
+
+### Features
+
+* **ui:** display app version from package.json in TopNav ([261fa16](https://github.com/berkayildi/llmshot/commit/261fa1696a4b6c7402a64370566701b4a3fb82b4))
+
 ## [0.1.2](https://github.com/berkayildi/llmshot/compare/llmshot-v0.1.1...llmshot-v0.1.2) (2026-04-19)
 
 
