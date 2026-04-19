@@ -20,11 +20,22 @@ See that repo for schema.
 ## Quick Start
 
 ```bash
-npm install
-npm run dev
+make setup
+make dev
 ```
 
 Opens at [http://localhost:3000](http://localhost:3000).
+
+## Development
+
+```bash
+make setup      # Install dependencies
+make dev        # Run dev server at localhost:3000
+make build      # Build production bundle
+make preview    # Preview production build locally
+make lint       # Run eslint
+make clean      # Remove node_modules and dist
+```
 
 ## Deployment
 
