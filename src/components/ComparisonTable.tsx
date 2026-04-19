@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import type { ModelStats, BenchmarkRun, MeetingTypeData } from "../types/benchmark";
+import type { ModelStats, BenchmarkRun, CategoryData } from "../types/benchmark";
 import {
   formatLatency,
   formatCost,
@@ -28,7 +28,7 @@ const COLUMNS: Column[] = [
 
 interface ComparisonTableProps {
   run?: BenchmarkRun;
-  data?: MeetingTypeData;
+  data?: CategoryData;
   onModelClick?: (model: string) => void;
 }
 

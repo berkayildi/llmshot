@@ -8,12 +8,12 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import type { BenchmarkRun, MeetingTypeData } from "../types/benchmark";
+import type { BenchmarkRun, CategoryData } from "../types/benchmark";
 import { shortModelName } from "./chartConfig";
 
 interface QualityChartProps {
   run?: BenchmarkRun;
-  data?: MeetingTypeData;
+  data?: CategoryData;
 }
 
 export default function QualityChart({ run, data }: QualityChartProps) {

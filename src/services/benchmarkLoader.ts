@@ -1,0 +1,215 @@
+import type {
+  BenchmarkDetail,
+  BenchmarkRun,
+  CategoryBreakdown,
+  DomainConfig,
+  DomainData,
+  LoadResult,
+  RawBenchmark,
+  RawSummary,
+  SubBenchmarkConfig,
+  SubBenchmarkData,
+} from "../types/benchmark";
+
+const GITHUB_BASE = "https://berkayildi.github.io/llm-benchmarks";
+
+export const DOMAINS: Record<string, DomainConfig> = {
+  realtime: {
+    id: "realtime",
+    name: "Real-Time Inference",
+    description:
+      "5 models across 3 task types. Which model works for latency-critical streaming?",
+    subtitle:
+      "Tested across ADR, sprint planning, and client discovery meeting transcripts.",
+    headline: "No single model wins",
+    route: "#/realtime",
+    sourceLinks: [],
+    subBenchmarks: [
+      {
+        id: "realtime",
+        name: "Real-Time Inference",
+        description: "",
+        summaryPath: "realtime/summary.json",
+        benchmarkPath: "realtime/benchmark.json",
+      },
+    ],
+  },
+  "text-generation": {
+    id: "text-generation",
+    name: "Text Generation",
+    description:
+      "Structured text output quality. Claude vs Gemini vs GPT on analysis and reasoning tasks.",
+    headline: "Gemini Flash-Lite: 45x cheaper, 0.95 quality",
+    route: "#/text-generation",
+    sourceLinks: [
+      {
+        label: "mcp-llm-eval",
+        url: "https://github.com/berkayildi/mcp-llm-eval",
+      },
+      {
+        label: "mcp-content-pipeline",
+        url: "https://github.com/berkayildi/mcp-content-pipeline",
+      },
+    ],
+    subBenchmarks: [
+      {
+        id: "eval-gates",
+        name: "Eval Gates",
+        description:
+          "CI/CD quality gates for LLM pipelines (mcp-llm-eval).",
+        summaryPath: "text-generation/eval-gates-summary.json",
+        benchmarkPath: "text-generation/eval-gates-benchmark.json",
+      },
+      {
+        id: "content-pipeline",
+        name: "Content Pipeline",
+        description:
+          "Automated video and feed analysis (mcp-content-pipeline).",
+        summaryPath: "text-generation/content-pipeline-summary.json",
+        benchmarkPath: "text-generation/content-pipeline-benchmark.json",
+      },
+    ],
+  },
+};
+
+function normalizeCategoryBreakdown(raw: RawSummary): CategoryBreakdown {
+  return raw.by_category ?? raw.by_meeting_type ?? {};
+}
+
+function parseRun(raw: RawSummary): BenchmarkRun {
+  return {
+    timestamp: raw.timestamp,
+    models: Object.keys(raw.overall),
+    overall: raw.overall,
+    categoryBreakdown: normalizeCategoryBreakdown(raw),
+    totalQuestions: raw.total_questions,
+    totalRuns: raw.total_model_runs,
+    totalEvalRuns: raw.total_eval_runs ?? raw.total_model_runs,
+    totalErrors: raw.total_errors,
+    totalElapsedSec: raw.total_elapsed_sec,
+    totalEstimatedCost: raw.total_estimated_cost,
+    judgeModel: raw.judge_model,
+  };
+}
+
+function parseDetail(raw: RawBenchmark): BenchmarkDetail {
+  return {
+    timestamp: raw.timestamp,
+    models: raw.models,
+    judgeModel: raw.judge_model,
+    totalEntries: raw.total_entries,
+    totalRuns: raw.total_runs,
+    totalElapsedSec: raw.total_elapsed_sec,
+    results: raw.results.map((r) => ({
+      eval_id: r.eval_id,
+      category: r.category ?? r.meeting_type ?? "",
+      model: r.model,
+      provider: r.provider,
+      response: r.response,
+      input_tokens: r.input_tokens,
+      output_tokens: r.output_tokens,
+      stop_reason: r.stop_reason,
+      time_to_first_token_ms: r.time_to_first_token_ms,
+      total_latency_ms: r.total_latency_ms,
+      cost_per_query: r.cost_per_query,
+      faithfulness_score: r.faithfulness_score,
+      faithfulness_reason: r.faithfulness_reason,
+      relevance_score: r.relevance_score,
+      relevance_reason: r.relevance_reason,
+      judge_model: r.judge_model,
+    })),
+  };
+}
+
+async function fetchJson<T>(path: string): Promise<T> {
+  const res = await fetch(`${GITHUB_BASE}/${path}`);
+  if (!res.ok) {
+    throw new Error(`Fetch failed (${res.status}): ${path}`);
+  }
+  return (await res.json()) as T;
+}
+
+export async function fetchSubBenchmark(
+  sub: SubBenchmarkConfig,
+): Promise<LoadResult<SubBenchmarkData>> {
+  try {
+    const [summary, benchmark] = await Promise.all([
+      fetchJson<RawSummary>(sub.summaryPath),
+      fetchJson<RawBenchmark>(sub.benchmarkPath),
+    ]);
+    return {
+      data: {
+        run: parseRun(summary),
+        detail: parseDetail(benchmark),
+      },
+    };
+  } catch (err) {
+    return {
+      error: err instanceof Error ? err.message : "Unknown fetch error",
+    };
+  }
+}
+
+export interface DomainStats {
+  models: number;
+  questions: number;
+  runs: number;
+  totalCost: number;
+}
+
+export async function fetchDomainStats(
+  domainId: string,
+): Promise<LoadResult<DomainStats>> {
+  const domain = DOMAINS[domainId];
+  if (!domain) return { error: `Unknown domain: ${domainId}` };
+
+  try {
+    const summaries = await Promise.all(
+      domain.subBenchmarks.map((sub) => fetchJson<RawSummary>(sub.summaryPath)),
+    );
+    const modelSet = new Set<string>();
+    let questions = 0;
+    let runs = 0;
+    let totalCost = 0;
+    for (const s of summaries) {
+      Object.keys(s.overall).forEach((m) => modelSet.add(m));
+      questions += s.total_questions;
+      runs += s.total_model_runs;
+      totalCost += s.total_estimated_cost;
+    }
+    return {
+      data: {
+        models: modelSet.size,
+        questions,
+        runs,
+        totalCost,
+      },
+    };
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Unknown fetch error" };
+  }
+}
+
+export async function fetchDomain(
+  domainId: string,
+): Promise<LoadResult<DomainData>> {
+  const domain = DOMAINS[domainId];
+  if (!domain) {
+    return { error: `Unknown domain: ${domainId}` };
+  }
+
+  const results = await Promise.all(
+    domain.subBenchmarks.map(async (sub) => {
+      const r = await fetchSubBenchmark(sub);
+      return { sub, result: r };
+    }),
+  );
+
+  const subBenchmarks: Record<string, SubBenchmarkData> = {};
+  for (const { sub, result } of results) {
+    if ("error" in result) return { error: result.error };
+    subBenchmarks[sub.id] = result.data;
+  }
+
+  return { data: { domain, subBenchmarks } };
+}

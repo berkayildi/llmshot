@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Radar,
   RadarChart,
@@ -14,11 +14,9 @@ import ComparisonTable from "./ComparisonTable";
 import QualityChart from "./QualityChart";
 import { MODEL_COLORS, shortModelName } from "./chartConfig";
 
-const MEETING_TYPES = [
-  { key: "adr", label: "ADR" },
-  { key: "sprint", label: "Sprint" },
-  { key: "discovery", label: "Discovery" },
-];
+function prettyCategoryLabel(key: string): string {
+  return key.replace(/[_-]/g, " ").toUpperCase();
+}
 
 interface RadarOverviewProps {
   run: BenchmarkRun;
@@ -26,19 +24,24 @@ interface RadarOverviewProps {
 
 function RadarOverview({ run }: RadarOverviewProps) {
   const models = run.models;
-  const types = Object.keys(run.byMeetingType);
+  const types = Object.keys(run.categoryBreakdown);
 
   const radarData = useMemo(() => {
-    const axes: Array<{ axis: string; type: string; metric: "avg_faithfulness" | "avg_relevance" }> = [];
+    const axes: Array<{
+      axis: string;
+      type: string;
+      metric: "avg_faithfulness" | "avg_relevance";
+    }> = [];
     for (const type of types) {
-      axes.push({ axis: `${type.toUpperCase()} Faith.`, type, metric: "avg_faithfulness" });
-      axes.push({ axis: `${type.toUpperCase()} Rel.`, type, metric: "avg_relevance" });
+      const label = prettyCategoryLabel(type);
+      axes.push({ axis: `${label} Faith.`, type, metric: "avg_faithfulness" });
+      axes.push({ axis: `${label} Rel.`, type, metric: "avg_relevance" });
     }
 
     return axes.map((a) => {
       const row: Record<string, string | number> = { axis: a.axis };
       for (const model of models) {
-        const stats = run.byMeetingType[a.type]?.[model];
+        const stats = run.categoryBreakdown[a.type]?.[model];
         row[model] = stats?.[a.metric] ?? 0;
       }
       return row;
@@ -48,7 +51,7 @@ function RadarOverview({ run }: RadarOverviewProps) {
   return (
     <div>
       <h3 className="text-xs uppercase tracking-wider text-gray-500 mb-3">
-        Quality Across Meeting Types &mdash; Generalist vs Specialist
+        Quality Across Categories &mdash; Generalist vs Specialist
       </h3>
       <ResponsiveContainer width="100%" height={380}>
         <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="72%">
@@ -92,48 +95,55 @@ function RadarOverview({ run }: RadarOverviewProps) {
   );
 }
 
-interface MeetingTypeBreakdownProps {
+interface CategoryBreakdownProps {
   run: BenchmarkRun | null;
   onModelClick: (model: string) => void;
 }
 
-export default function MeetingTypeBreakdown({ run, onModelClick }: MeetingTypeBreakdownProps) {
-  const [activeTab, setActiveTab] = useState("adr");
+export default function CategoryBreakdown({ run, onModelClick }: CategoryBreakdownProps) {
+  const categoryKeys = useMemo(
+    () => (run ? Object.keys(run.categoryBreakdown) : []),
+    [run],
+  );
+  const [activeTab, setActiveTab] = useState<string>(categoryKeys[0] ?? "");
 
-  if (!run || !run.byMeetingType) return null;
+  useEffect(() => {
+    if (categoryKeys.length === 0) return;
+    if (!categoryKeys.includes(activeTab)) {
+      setActiveTab(categoryKeys[0]!);
+    }
+  }, [categoryKeys, activeTab]);
 
-  const tabData = run.byMeetingType[activeTab] ?? null;
+  if (!run || categoryKeys.length === 0) return null;
+
+  const tabData = run.categoryBreakdown[activeTab] ?? null;
 
   return (
     <div className="space-y-6">
-      {/* Radar chart */}
       <section className="bg-gray-900/50 border border-gray-800/50 rounded-lg p-4">
         <RadarOverview run={run} />
       </section>
 
-      {/* Tabbed breakdown */}
       <section className="bg-gray-900/50 border border-gray-800/50 rounded-lg">
-        {/* Tab bar */}
-        <div className="flex border-b border-gray-800/50">
-          {MEETING_TYPES.map((t) => {
-            const isActive = activeTab === t.key;
+        <div className="flex border-b border-gray-800/50 overflow-x-auto">
+          {categoryKeys.map((key) => {
+            const isActive = activeTab === key;
             return (
               <button
-                key={t.key}
-                onClick={() => setActiveTab(t.key)}
-                className={`px-5 py-3 text-xs uppercase tracking-wider font-medium cursor-pointer transition-colors ${
+                key={key}
+                onClick={() => setActiveTab(key)}
+                className={`px-5 py-3 text-xs uppercase tracking-wider font-medium cursor-pointer transition-colors whitespace-nowrap ${
                   isActive
                     ? "text-gray-100 border-b-2 border-blue-500 -mb-px"
                     : "text-gray-500 hover:text-gray-400"
                 }`}
               >
-                {t.label}
+                {prettyCategoryLabel(key)}
               </button>
             );
           })}
         </div>
 
-        {/* Tab content */}
         <div className="p-4 space-y-6">
           {tabData ? (
             <>
@@ -141,9 +151,7 @@ export default function MeetingTypeBreakdown({ run, onModelClick }: MeetingTypeB
               <QualityChart data={tabData} />
             </>
           ) : (
-            <p className="text-gray-500 text-sm py-4">
-              No data for this meeting type.
-            </p>
+            <p className="text-gray-500 text-sm py-4">No data for this category.</p>
           )}
         </div>
       </section>

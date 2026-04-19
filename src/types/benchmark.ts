@@ -1,4 +1,3 @@
-/** Per-model aggregate statistics from benchmark summary */
 export interface ModelStats {
   runs: number;
   avg_ttft_ms: number;
@@ -12,32 +11,33 @@ export interface ModelStats {
   model: string;
 }
 
-/** Stats grouped by meeting type — each key is a model name */
-export type MeetingTypeData = Record<string, ModelStats>;
+/** Per-category stats. Key is model name. */
+export type CategoryData = Record<string, ModelStats>;
 
-/** All meeting type breakdowns — each key is a meeting type (e.g. "adr", "sprint") */
-export type SummaryData = Record<string, MeetingTypeData>;
+/** All category breakdowns. Key is a category name (e.g. "adr", "factual"). */
+export type CategoryBreakdown = Record<string, CategoryData>;
 
-/** Raw summary JSON schema as stored on disk */
+/** Raw summary JSON — realtime variant uses `by_meeting_type`, text-gen uses `by_category`. */
 export interface RawSummary {
   timestamp: string;
   total_questions: number;
   total_model_runs: number;
-  total_eval_runs: number;
+  total_eval_runs?: number;
   total_errors: number;
   total_elapsed_sec: number;
   total_estimated_cost: number;
   judge_model: string;
   overall: Record<string, ModelStats>;
-  by_meeting_type: SummaryData;
+  by_meeting_type?: CategoryBreakdown;
+  by_category?: CategoryBreakdown;
 }
 
-/** Normalized benchmark run after parsing */
+/** Normalized benchmark run. */
 export interface BenchmarkRun {
   timestamp: string;
   models: string[];
   overall: Record<string, ModelStats>;
-  byMeetingType: SummaryData;
+  categoryBreakdown: CategoryBreakdown;
   totalQuestions: number;
   totalRuns: number;
   totalEvalRuns: number;
@@ -47,10 +47,10 @@ export interface BenchmarkRun {
   judgeModel: string;
 }
 
-/** Individual benchmark result per question per model */
+/** Individual benchmark result — category normalized. */
 export interface BenchmarkResult {
   eval_id: string;
-  meeting_type: string;
+  category: string;
   model: string;
   provider: string;
   response: string;
@@ -67,7 +67,27 @@ export interface BenchmarkResult {
   judge_model: string;
 }
 
-/** Raw benchmark detail JSON schema */
+/** Raw per-result record — realtime uses `meeting_type`, text-gen uses `category`. */
+export interface RawBenchmarkResult {
+  eval_id: string;
+  meeting_type?: string;
+  category?: string;
+  model: string;
+  provider: string;
+  response: string;
+  input_tokens: number;
+  output_tokens: number;
+  stop_reason: string;
+  time_to_first_token_ms: number;
+  total_latency_ms: number;
+  cost_per_query: number;
+  faithfulness_score: number;
+  faithfulness_reason: string;
+  relevance_score: number;
+  relevance_reason: string;
+  judge_model: string;
+}
+
 export interface RawBenchmark {
   timestamp: string;
   total_entries: number;
@@ -75,10 +95,9 @@ export interface RawBenchmark {
   judge_model: string;
   total_runs: number;
   total_elapsed_sec: number;
-  results: BenchmarkResult[];
+  results: RawBenchmarkResult[];
 }
 
-/** Parsed benchmark detail */
 export interface BenchmarkDetail {
   timestamp: string;
   models: string[];
@@ -88,3 +107,42 @@ export interface BenchmarkDetail {
   totalElapsedSec: number;
   results: BenchmarkResult[];
 }
+
+export interface SourceLink {
+  label: string;
+  url: string;
+}
+
+/** Sub-benchmark inside a domain (e.g. "Eval Gates" under Text Generation). */
+export interface SubBenchmarkConfig {
+  id: string;
+  name: string;
+  description: string;
+  summaryPath: string;
+  benchmarkPath: string;
+}
+
+export interface DomainConfig {
+  id: string;
+  name: string;
+  description: string;
+  subtitle?: string;
+  headline: string;
+  route: string;
+  sourceLinks: SourceLink[];
+  subBenchmarks: SubBenchmarkConfig[];
+}
+
+/** Fetched run + detail for a single sub-benchmark. */
+export interface SubBenchmarkData {
+  run: BenchmarkRun;
+  detail: BenchmarkDetail;
+}
+
+/** Top-level data for a domain. Each sub-benchmark keyed by its id. */
+export interface DomainData {
+  domain: DomainConfig;
+  subBenchmarks: Record<string, SubBenchmarkData>;
+}
+
+export type LoadResult<T> = { data: T } | { error: string };

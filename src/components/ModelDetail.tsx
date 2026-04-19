@@ -1,6 +1,10 @@
 import { useMemo } from "react";
-import type { BenchmarkRun, BenchmarkResult, SummaryData } from "../types/benchmark";
-import { loadBenchmarkDetail } from "../utils/dataLoader";
+import type {
+  BenchmarkDetail,
+  BenchmarkResult,
+  BenchmarkRun,
+  CategoryBreakdown,
+} from "../types/benchmark";
 import {
   formatLatency,
   formatCost,
@@ -22,22 +26,23 @@ function StatRow({ label, value }: StatRowProps) {
   );
 }
 
-interface MeetingTypeStatsProps {
+interface CategoryStatsProps {
   model: string;
-  byMeetingType: SummaryData;
+  categoryBreakdown: CategoryBreakdown;
 }
 
-function MeetingTypeStats({ model, byMeetingType }: MeetingTypeStatsProps) {
-  const types = Object.keys(byMeetingType);
+function CategoryStats({ model, categoryBreakdown }: CategoryStatsProps) {
+  const types = Object.keys(categoryBreakdown);
+  if (types.length === 0) return null;
 
   return (
     <div>
       <h4 className="text-[11px] uppercase tracking-wider text-gray-500 mb-2">
-        By Meeting Type
+        By Category
       </h4>
       <div className="grid grid-cols-1 gap-3">
         {types.map((type) => {
-          const stats = byMeetingType[type]?.[model];
+          const stats = categoryBreakdown[type]?.[model];
           if (!stats) return null;
           return (
             <div key={type} className="bg-gray-800/30 rounded px-3 py-2">
@@ -97,7 +102,7 @@ function QuestionResults({ results }: QuestionResultsProps) {
           <div key={i} className="bg-gray-800/30 rounded px-3 py-2">
             <div className="flex items-center justify-between mb-1">
               <span className="text-[10px] uppercase tracking-wider text-gray-500">
-                {r.eval_id} &middot; {r.meeting_type}
+                {r.eval_id} &middot; {r.category}
               </span>
               <div className="flex gap-3">
                 <span className="text-[10px] text-gray-500">
@@ -135,17 +140,13 @@ function QuestionResults({ results }: QuestionResultsProps) {
 interface ModelDetailProps {
   model: string;
   run: BenchmarkRun | null;
+  detail: BenchmarkDetail | null;
   onClose: () => void;
 }
 
-export default function ModelDetail({ model, run, onClose }: ModelDetailProps) {
+export default function ModelDetail({ model, run, detail, onClose }: ModelDetailProps) {
   const overallStats = run?.overall?.[model];
   const color = MODEL_COLORS[model] || "#6b7280";
-
-  const detail = useMemo(() => {
-    if (!run) return null;
-    return loadBenchmarkDetail(run.timestamp);
-  }, [run]);
 
   const modelResults = useMemo(() => {
     if (!detail?.results) return [];
@@ -156,15 +157,12 @@ export default function ModelDetail({ model, run, onClose }: ModelDetailProps) {
 
   return (
     <>
-      {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/60 z-40"
         onClick={onClose}
       />
 
-      {/* Panel */}
       <div className="fixed top-0 right-0 h-full w-full max-w-lg bg-gray-950 border-l border-gray-800 z-50 overflow-y-auto">
-        {/* Header */}
         <div className="sticky top-0 bg-gray-950/95 backdrop-blur-sm border-b border-gray-800 px-5 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div
@@ -186,9 +184,7 @@ export default function ModelDetail({ model, run, onClose }: ModelDetailProps) {
           </button>
         </div>
 
-        {/* Body */}
         <div className="px-5 py-4 space-y-5">
-          {/* Overall stats */}
           <div>
             <h4 className="text-[11px] uppercase tracking-wider text-gray-500 mb-2">
               Overall
@@ -203,12 +199,10 @@ export default function ModelDetail({ model, run, onClose }: ModelDetailProps) {
             <StatRow label="Relevance" value={formatScore(overallStats.avg_relevance)} />
           </div>
 
-          {/* Meeting type breakdown */}
-          {run.byMeetingType && (
-            <MeetingTypeStats model={model} byMeetingType={run.byMeetingType} />
+          {run.categoryBreakdown && (
+            <CategoryStats model={model} categoryBreakdown={run.categoryBreakdown} />
           )}
 
-          {/* Per-question results */}
           <QuestionResults results={modelResults} />
         </div>
       </div>
