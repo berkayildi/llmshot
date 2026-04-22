@@ -83,6 +83,13 @@ function CategoryStats({ model, categoryBreakdown }: CategoryStatsProps) {
   );
 }
 
+function scoreColor(score: number | null | undefined): string {
+  if (score == null) return "text-gray-600";
+  if (score >= 0.8) return "text-emerald-400";
+  if (score >= 0.5) return "text-yellow-400";
+  return "text-red-400";
+}
+
 function formatResponsePreview(text: string): string {
   const cleaned = text
     .replace(/^```(?:json)?\s*\n?/, "")
@@ -115,13 +122,13 @@ function QuestionResults({ results }: QuestionResultsProps) {
               <div className="flex gap-3">
                 <span className="text-[10px] text-gray-500">
                   Faith.{" "}
-                  <span className={`font-mono ${r.faithfulness_score >= 0.8 ? "text-emerald-400" : r.faithfulness_score >= 0.5 ? "text-yellow-400" : "text-red-400"}`}>
+                  <span className={`font-mono ${scoreColor(r.faithfulness_score)}`}>
                     {formatScore(r.faithfulness_score)}
                   </span>
                 </span>
                 <span className="text-[10px] text-gray-500">
                   Rel.{" "}
-                  <span className={`font-mono ${r.relevance_score >= 0.8 ? "text-emerald-400" : r.relevance_score >= 0.5 ? "text-yellow-400" : "text-red-400"}`}>
+                  <span className={`font-mono ${scoreColor(r.relevance_score)}`}>
                     {formatScore(r.relevance_score)}
                   </span>
                 </span>
