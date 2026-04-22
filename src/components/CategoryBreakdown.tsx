@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Radar,
   RadarChart,
@@ -105,14 +105,11 @@ export default function CategoryBreakdown({ run, onModelClick }: CategoryBreakdo
     () => (run ? Object.keys(run.categoryBreakdown) : []),
     [run],
   );
-  const [activeTab, setActiveTab] = useState<string>(categoryKeys[0] ?? "");
-
-  useEffect(() => {
-    if (categoryKeys.length === 0) return;
-    if (!categoryKeys.includes(activeTab)) {
-      setActiveTab(categoryKeys[0]!);
-    }
-  }, [categoryKeys, activeTab]);
+  const [selectedTab, setSelectedTab] = useState<string>("");
+  const activeTab =
+    selectedTab && categoryKeys.includes(selectedTab)
+      ? selectedTab
+      : categoryKeys[0] ?? "";
 
   if (!run || categoryKeys.length === 0) return null;
 
@@ -131,7 +128,7 @@ export default function CategoryBreakdown({ run, onModelClick }: CategoryBreakdo
             return (
               <button
                 key={key}
-                onClick={() => setActiveTab(key)}
+                onClick={() => setSelectedTab(key)}
                 className={`px-5 py-3 text-xs uppercase tracking-wider font-medium cursor-pointer transition-colors whitespace-nowrap ${
                   isActive
                     ? "text-gray-100 border-b-2 border-blue-500 -mb-px"
