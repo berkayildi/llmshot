@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.4](https://github.com/berkayildi/llmshot/compare/llmshot-v0.1.3...llmshot-v0.1.4) (2026-04-22)
+
+
+### Bug Fixes
+
+* **data:** drop error records from benchmark detail ([077ef59](https://github.com/berkayildi/llmshot/commit/077ef5902650399b5872c75191b1e0d5fb768c6e))
+* **ui:** allow sub-benchmark tab strip to scroll on narrow viewports ([bcd9a91](https://github.com/berkayildi/llmshot/commit/bcd9a913dcac610bb466b8e43e11aec047e188cc))
+* **ui:** derive CategoryBreakdown active tab from available keys ([b1e979b](https://github.com/berkayildi/llmshot/commit/b1e979beb3e03b9ef48e7105bb54f64648d321fd))
+* **ui:** render null scores in neutral gray, not red ([f55739b](https://github.com/berkayildi/llmshot/commit/f55739be2b2a2e76df4018f96711ceeb554e93d8))
+* **ui:** skip best/worst coloring when all values tie ([3c77852](https://github.com/berkayildi/llmshot/commit/3c778524224650cd0c07671c69ab23de335489c7))
+* **ui:** strip markdown JSON fences from response preview ([c23ce0f](https://github.com/berkayildi/llmshot/commit/c23ce0f99d286477f5f3353709c8e8e83ba76d1d))
+
 ## [0.1.3](https://github.com/berkayildi/llmshot/compare/llmshot-v0.1.2...llmshot-v0.1.3) (2026-04-19)
 
 
