@@ -83,6 +83,14 @@ function CategoryStats({ model, categoryBreakdown }: CategoryStatsProps) {
   );
 }
 
+function formatResponsePreview(text: string): string {
+  const cleaned = text
+    .replace(/^```(?:json)?\s*\n?/, "")
+    .replace(/\n?```\s*$/, "")
+    .trim();
+  return cleaned.length > 200 ? `${cleaned.slice(0, 200)}...` : cleaned;
+}
+
 interface QuestionResultsProps {
   results: BenchmarkResult[];
 }
@@ -126,8 +134,7 @@ function QuestionResults({ results }: QuestionResultsProps) {
             </div>
             {r.response && (
               <p className="text-xs text-gray-400 leading-relaxed line-clamp-3">
-                {r.response.slice(0, 200)}
-                {r.response.length > 200 && "..."}
+                {formatResponsePreview(r.response)}
               </p>
             )}
           </div>
