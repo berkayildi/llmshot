@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { DOMAINS, fetchDomainStats } from "../services/benchmarkLoader";
 import type { DomainConfig } from "../types/benchmark";
 import { formatCost } from "../utils/formatters";
@@ -31,8 +32,8 @@ function DomainCard({ domain }: DomainCardProps) {
   }, [domain.id]);
 
   return (
-    <a
-      href={domain.route}
+    <Link
+      to={domain.route}
       className="group block bg-gray-900/50 border border-gray-800 rounded-lg p-6 hover:border-gray-700 hover:bg-gray-900/80 transition-colors"
     >
       <h2 className="text-lg font-semibold text-gray-100 tracking-tight">
@@ -78,7 +79,7 @@ function DomainCard({ domain }: DomainCardProps) {
       <p className="mt-4 text-xs text-gray-500 group-hover:text-gray-300 transition-colors">
         View dashboard &rarr;
       </p>
-    </a>
+    </Link>
   );
 }
 

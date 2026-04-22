@@ -22,7 +22,7 @@ export const DOMAINS: Record<string, DomainConfig> = {
     subtitle:
       "Tested across ADR, sprint planning, and client discovery meeting transcripts.",
     headline: "No single model wins",
-    route: "#/realtime",
+    route: "/realtime",
     sourceLinks: [],
     subBenchmarks: [
       {
@@ -40,7 +40,7 @@ export const DOMAINS: Record<string, DomainConfig> = {
     description:
       "Structured text output quality. Claude vs Gemini vs GPT on analysis and reasoning tasks.",
     headline: "Gemini Flash-Lite: 45x cheaper, 0.95 quality",
-    route: "#/text-generation",
+    route: "/text-generation",
     sourceLinks: [
       {
         label: "mcp-llm-eval",
