@@ -109,14 +109,14 @@ export default function DomainDashboard({ domainId }: DomainDashboardProps) {
 
       {hasMultipleSubs && (
         <div className="mb-6">
-          <div className="flex gap-0 border-b border-gray-800">
+          <div className="flex gap-0 border-b border-gray-800 overflow-x-auto">
             {domain.subBenchmarks.map((sub) => {
               const isActive = activeSubConfig.id === sub.id;
               return (
                 <button
                   key={sub.id}
                   onClick={() => setActiveSubId(sub.id)}
-                  className={`px-4 pb-3 text-xs uppercase tracking-wider font-medium cursor-pointer transition-colors -mb-px ${
+                  className={`px-4 pb-3 text-xs uppercase tracking-wider font-medium cursor-pointer transition-colors -mb-px whitespace-nowrap ${
                     isActive
                       ? "text-gray-100 border-b-2 border-blue-500"
                       : "text-gray-500 hover:text-gray-400 border-b-2 border-transparent"
