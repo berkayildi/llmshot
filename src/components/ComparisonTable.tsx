@@ -77,6 +77,7 @@ export default function ComparisonTable({ run, data, onModelClick }: ComparisonT
   function cellColor(col: Column, value: string | number) {
     const ex = extremes[col.key];
     if (!ex || value == null) return "";
+    if (ex.best === ex.worst) return "";
     if (value === ex.best) return "text-emerald-400";
     if (value === ex.worst) return "text-red-400";
     return "";
