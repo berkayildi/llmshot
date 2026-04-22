@@ -13,8 +13,8 @@ Live: [llmshot.vercel.app](https://llmshot.vercel.app)
 
 ## Domains
 
-- **Real-Time Inference** (`#/realtime`) — latency-critical streaming tasks across ADR, sprint planning, discovery.
-- **Text Generation** (`#/text-generation`) — structured text output quality, split into sub-benchmarks (Eval Gates, Content Pipeline).
+- **Real-Time Inference** (`/realtime`) — latency-critical streaming tasks across ADR, sprint planning, discovery.
+- **Text Generation** (`/text-generation`) — structured text output quality, split into sub-benchmarks (Eval Gates, Content Pipeline).
 
 ## Data
 
