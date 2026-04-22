@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.5](https://github.com/berkayildi/llmshot/compare/llmshot-v0.1.4...llmshot-v0.1.5) (2026-04-22)
+
+
+### Features
+
+* **routing:** migrate from hash routing to path-based routing ([428858f](https://github.com/berkayildi/llmshot/commit/428858f0c138a0cae6b25ca51d60109760316bd8))
+
 ## [0.1.4](https://github.com/berkayildi/llmshot/compare/llmshot-v0.1.3...llmshot-v0.1.4) (2026-04-22)
 
 
