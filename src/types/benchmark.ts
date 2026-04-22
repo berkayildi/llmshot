@@ -74,18 +74,19 @@ export interface RawBenchmarkResult {
   category?: string;
   model: string;
   provider: string;
-  response: string;
-  input_tokens: number;
-  output_tokens: number;
-  stop_reason: string;
-  time_to_first_token_ms: number;
-  total_latency_ms: number;
-  cost_per_query: number;
-  faithfulness_score: number;
-  faithfulness_reason: string;
-  relevance_score: number;
-  relevance_reason: string;
-  judge_model: string;
+  response?: string;
+  input_tokens?: number;
+  output_tokens?: number;
+  stop_reason?: string;
+  time_to_first_token_ms?: number;
+  total_latency_ms?: number;
+  cost_per_query?: number;
+  faithfulness_score?: number;
+  faithfulness_reason?: string;
+  relevance_score?: number;
+  relevance_reason?: string;
+  judge_model?: string;
+  error?: string;
 }
 
 export interface RawBenchmark {

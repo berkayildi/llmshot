@@ -157,7 +157,7 @@ export default function ModelDetail({ model, run, detail, onClose }: ModelDetail
 
   const modelResults = useMemo(() => {
     if (!detail?.results) return [];
-    return detail.results.filter((r) => r.model === model);
+    return detail.results.filter((r) => r.model === model && !!r.response);
   }, [detail, model]);
 
   if (!model || !run || !overallStats) return null;
