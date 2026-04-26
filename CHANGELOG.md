@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.6](https://github.com/berkayildi/llmshot/compare/llmshot-v0.1.5...llmshot-v0.1.6) (2026-04-26)
+
+
+### Features
+
+* **ui:** add /retrieval domain with IR metrics dashboard ([b0d29eb](https://github.com/berkayildi/llmshot/commit/b0d29eb8d5d7bb22317907d777f5c8880894078e))
+* **ui:** add embeddings sub-benchmark to /retrieval ([70fa2f7](https://github.com/berkayildi/llmshot/commit/70fa2f794b6ae1263c64f22924c22f7e76ccf832))
+
 ## [0.1.5](https://github.com/berkayildi/llmshot/compare/llmshot-v0.1.4...llmshot-v0.1.5) (2026-04-22)
 
 
