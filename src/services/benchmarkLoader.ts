@@ -41,10 +41,10 @@ export const DOMAINS: Record<string, DomainConfig> = {
     id: "retrieval",
     name: "Retrieval & RAG",
     description:
-      "BM25 retrieval over AWS documentation. Quality, latency, and citation faithfulness across 5 models.",
+      "BM25 vs embedding retrieval over AWS documentation. Quality, latency, and citation faithfulness.",
     subtitle:
-      "20 labelled queries × 5 models. IR metrics, generation quality, retrieval-augmented cost.",
-    headline: "Recall is solved. Citation faithfulness is the bottleneck.",
+      "BM25 baseline plus OpenAI and Google embedding adapters. Anthropic doesn't ship a public embeddings API, so it's not in the embeddings comparison.",
+    headline: "Google embeddings lead recall and nDCG; BM25 wins on cost.",
     route: "/retrieval",
     sourceLinks: [
       {
@@ -54,12 +54,20 @@ export const DOMAINS: Record<string, DomainConfig> = {
     ],
     subBenchmarks: [
       {
-        id: "eval-gates-rag",
-        name: "Eval Gates RAG",
+        id: "bm25-baseline",
+        name: "BM25 Baseline",
         description:
-          "Retrieval-augmented generation evaluation dogfooded by mcp-llm-eval against a corpus of AWS service documentation.",
+          "Lexical keyword-matching baseline. IR metrics are identical across the 5 generation models because BM25 is model-agnostic.",
         summaryPath: "retrieval/eval-gates-rag-summary.json",
         benchmarkPath: "retrieval/eval-gates-rag-benchmark.json",
+      },
+      {
+        id: "embeddings",
+        name: "Embeddings Comparison",
+        description:
+          "Vector retrieval across 3 embedding models (OpenAI text-embedding-3-small, text-embedding-3-large, Google gemini-embedding-001). IR metrics differ per retriever because each model retrieves different chunks.",
+        summaryPath: "retrieval/embeddings-summary.json",
+        benchmarkPath: "retrieval/embeddings-benchmark.json",
       },
     ],
   },
@@ -246,12 +254,16 @@ export async function fetchDomain(
 }
 
 function parseRAGRun(raw: RawRAGSummary): RAGBenchmarkRun {
+  const adapter =
+    raw.adapter ??
+    (raw.adapters && raw.adapters.length > 0 ? raw.adapters.join(",") : "");
   return {
     timestamp: raw.timestamp,
     models: Object.keys(raw.overall),
     overall: raw.overall,
     k: raw.k,
-    adapter: raw.adapter,
+    adapter,
+    adapters: raw.adapters,
     totalQueries: raw.total_queries,
     totalRuns: raw.total_model_runs,
     totalErrors: raw.total_errors,

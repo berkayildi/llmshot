@@ -174,7 +174,10 @@ export interface RAGModelStats {
 export interface RawRAGSummary {
   timestamp: string;
   k: number;
-  adapter: string;
+  /** Single adapter (legacy) or comma-joined names for multi-retriever runs. */
+  adapter?: string;
+  /** Multi-retriever runs (evaluate-rag-multi) carry the full list here. */
+  adapters?: string[];
   total_queries: number;
   total_questions: number;
   total_model_runs: number;
@@ -195,6 +198,7 @@ export interface RAGBenchmarkRun {
   overall: Record<string, RAGModelStats>;
   k: number;
   adapter: string;
+  adapters?: string[];
   totalQueries: number;
   totalRuns: number;
   totalErrors: number;
