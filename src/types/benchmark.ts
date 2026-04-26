@@ -147,3 +147,62 @@ export interface DomainData {
 }
 
 export type LoadResult<T> = { data: T } | { error: string };
+
+/** Per-model retrieval/RAG metrics in the overall block. */
+export interface RAGModelStats {
+  provider: string;
+  model: string;
+  runs: number;
+  k: number;
+  avg_recall_at_k: number;
+  avg_precision_at_k: number;
+  avg_mrr: number;
+  avg_ndcg_at_k: number;
+  avg_context_relevance: number | null;
+  avg_citation_faithfulness: number | null;
+  avg_retrieval_latency_ms: number;
+  p50_retrieval_latency_ms: number;
+  p95_retrieval_latency_ms: number;
+  avg_ttft_ms: number;
+  avg_latency_ms: number;
+  avg_input_tokens: number;
+  avg_output_tokens: number;
+  avg_cost_per_query: number;
+}
+
+/** Raw retrieval/RAG summary JSON. */
+export interface RawRAGSummary {
+  timestamp: string;
+  k: number;
+  adapter: string;
+  total_queries: number;
+  total_questions: number;
+  total_model_runs: number;
+  total_errors: number;
+  total_elapsed_sec: number;
+  total_estimated_cost: number;
+  judge_model: string | null;
+  skipped: string[];
+  overall: Record<string, RAGModelStats>;
+  by_category: Record<string, never>;
+  results?: unknown[];
+}
+
+/** Normalised retrieval/RAG run. */
+export interface RAGBenchmarkRun {
+  timestamp: string;
+  models: string[];
+  overall: Record<string, RAGModelStats>;
+  k: number;
+  adapter: string;
+  totalQueries: number;
+  totalRuns: number;
+  totalErrors: number;
+  totalElapsedSec: number;
+  totalEstimatedCost: number;
+  judgeModel: string | null;
+}
+
+export interface RAGSubBenchmarkData {
+  run: RAGBenchmarkRun;
+}

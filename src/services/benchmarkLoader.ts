@@ -5,7 +5,10 @@ import type {
   DomainConfig,
   DomainData,
   LoadResult,
+  RAGBenchmarkRun,
+  RAGSubBenchmarkData,
   RawBenchmark,
+  RawRAGSummary,
   RawSummary,
   SubBenchmarkConfig,
   SubBenchmarkData,
@@ -31,6 +34,32 @@ export const DOMAINS: Record<string, DomainConfig> = {
         description: "",
         summaryPath: "realtime/summary.json",
         benchmarkPath: "realtime/benchmark.json",
+      },
+    ],
+  },
+  retrieval: {
+    id: "retrieval",
+    name: "Retrieval & RAG",
+    description:
+      "BM25 retrieval over AWS documentation. Quality, latency, and citation faithfulness across 5 models.",
+    subtitle:
+      "20 labelled queries × 5 models. IR metrics, generation quality, retrieval-augmented cost.",
+    headline: "Recall is solved. Citation faithfulness is the bottleneck.",
+    route: "/retrieval",
+    sourceLinks: [
+      {
+        label: "mcp-llm-eval",
+        url: "https://github.com/berkayildi/mcp-llm-eval",
+      },
+    ],
+    subBenchmarks: [
+      {
+        id: "eval-gates-rag",
+        name: "Eval Gates RAG",
+        description:
+          "Retrieval-augmented generation evaluation dogfooded by mcp-llm-eval against a corpus of AWS service documentation.",
+        summaryPath: "retrieval/eval-gates-rag-summary.json",
+        benchmarkPath: "retrieval/eval-gates-rag-benchmark.json",
       },
     ],
   },
@@ -214,4 +243,33 @@ export async function fetchDomain(
   }
 
   return { data: { domain, subBenchmarks } };
+}
+
+function parseRAGRun(raw: RawRAGSummary): RAGBenchmarkRun {
+  return {
+    timestamp: raw.timestamp,
+    models: Object.keys(raw.overall),
+    overall: raw.overall,
+    k: raw.k,
+    adapter: raw.adapter,
+    totalQueries: raw.total_queries,
+    totalRuns: raw.total_model_runs,
+    totalErrors: raw.total_errors,
+    totalElapsedSec: raw.total_elapsed_sec,
+    totalEstimatedCost: raw.total_estimated_cost,
+    judgeModel: raw.judge_model,
+  };
+}
+
+export async function fetchRAGSubBenchmark(
+  sub: SubBenchmarkConfig,
+): Promise<LoadResult<RAGSubBenchmarkData>> {
+  try {
+    const summary = await fetchJson<RawRAGSummary>(sub.summaryPath);
+    return { data: { run: parseRAGRun(summary) } };
+  } catch (err) {
+    return {
+      error: err instanceof Error ? err.message : "Unknown fetch error",
+    };
+  }
 }

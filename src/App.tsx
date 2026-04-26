@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import TopNav from './components/TopNav';
 import LandingPage from './components/LandingPage';
 import DomainDashboard from './components/DomainDashboard';
+import RetrievalDashboard from './components/RetrievalDashboard';
 
 const GLOBAL_SOURCES: Array<{ label: string; url: string }> = [
   { label: 'GitHub', url: 'https://github.com/berkayildi/llmshot' },
@@ -24,6 +25,7 @@ function App() {
               path="/text-generation"
               element={<DomainDashboard domainId="text-generation" />}
             />
+            <Route path="/retrieval" element={<RetrievalDashboard />} />
           </Routes>
         </main>
         <footer className="border-t border-gray-800 mt-8">
