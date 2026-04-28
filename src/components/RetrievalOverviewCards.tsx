@@ -31,6 +31,11 @@ export default function RetrievalOverviewCards({ run }: Props) {
       ? `${run.totalElapsedSec.toFixed(1)}s`
       : `${(run.totalElapsedSec / 60).toFixed(1)}m`;
 
+  const adapterLabel =
+    run.adapter.length > 20
+      ? `${run.adapter.split(",").length} ADAPTERS`
+      : run.adapter.toUpperCase();
+
   return (
     <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
       <Card label="Models" value={run.models.length} sub="benchmarked" />
@@ -46,7 +51,7 @@ export default function RetrievalOverviewCards({ run }: Props) {
       />
       <Card
         label="Adapter"
-        value={run.adapter.toUpperCase()}
+        value={adapterLabel}
         sub={`k = ${run.k}`}
       />
       <Card

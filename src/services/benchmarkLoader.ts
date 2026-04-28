@@ -21,7 +21,7 @@ export const DOMAINS: Record<string, DomainConfig> = {
     id: "realtime",
     name: "Real-Time Inference",
     description:
-      "5 models across 3 task types. Which model works for latency-critical streaming?",
+      "Which model works for latency-critical streaming? Tested across 3 task types.",
     subtitle:
       "Tested across ADR, sprint planning, and client discovery meeting transcripts.",
     headline: "No single model wins",
