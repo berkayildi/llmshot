@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.7](https://github.com/berkayildi/llmshot/compare/llmshot-v0.1.6...llmshot-v0.1.7) (2026-04-28)
+
+
+### Bug Fixes
+
+* **ui:** add frontier model colors, fix cost precision, adapter overflow and stale description ([f256041](https://github.com/berkayildi/llmshot/commit/f256041b5bcdc8cc020ecf0dbebd496e2b0b69f1))
+* **ui:** correct gemini-3-flash-preview short name ([a2119b9](https://github.com/berkayildi/llmshot/commit/a2119b9611a63bdd880d261538c01760d4a56342))
+
 ## [0.1.6](https://github.com/berkayildi/llmshot/compare/llmshot-v0.1.5...llmshot-v0.1.6) (2026-04-26)
 
 
