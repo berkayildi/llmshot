@@ -17,7 +17,7 @@ const SHORT_NAMES: Record<string, string> = {
   "gemini-2.5-flash-lite": "gem-2.5-lite",
   "gpt-5.5": "gpt-5.5",
   "claude-opus-4-7": "claude-opus-4.7",
-  "gemini-3-flash-preview": "i-3-flash-preview",
+  "gemini-3-flash-preview": "gem-3-flash-preview",
 };
 
 export function shortModelName(model: string): string {
