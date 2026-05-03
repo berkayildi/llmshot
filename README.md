@@ -11,7 +11,7 @@ Live: [llmshot.vercel.app](https://llmshot.vercel.app)
 
 ## Role in ecosystem
 
-LLMShot is the visualization layer. It fetches benchmark JSON from [llm-benchmarks](https://github.com/berkayildi/llm-benchmarks) (served via GitHub Pages) and renders three domain dashboards. It doesn't run benchmarks itself — those live in the producer repos ([mcp-llm-eval](https://github.com/berkayildi/mcp-llm-eval), [mcp-content-pipeline](https://github.com/berkayildi/mcp-content-pipeline), [meeting-agent](https://github.com/berkayildi/meeting-agent)).
+LLMShot is the visualization layer. It fetches benchmark JSON from [llm-benchmarks](https://github.com/berkayildi/llm-benchmarks) (served via GitHub Pages) and renders three domain dashboards. It doesn't run benchmarks itself — those live in the producer repos ([mcp-llm-eval](https://github.com/berkayildi/mcp-llm-eval), [mcp-content-pipeline](https://github.com/berkayildi/mcp-content-pipeline)).
 
 Read-only by design. Auto-redeploys on every push to `llm-benchmarks/main` via Vercel.
 
