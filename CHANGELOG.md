@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.8](https://github.com/berkayildi/llmshot/compare/llmshot-v0.1.7...llmshot-v0.1.8) (2026-05-04)
+
+
+### Features
+
+* add Vercel Web Analytics ([ac3333f](https://github.com/berkayildi/llmshot/commit/ac3333f0c0d097b6309fb040fb281b4eec826439))
+
 ## [0.1.7](https://github.com/berkayildi/llmshot/compare/llmshot-v0.1.6...llmshot-v0.1.7) (2026-04-28)
 
 
