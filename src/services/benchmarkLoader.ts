@@ -41,15 +41,19 @@ export const DOMAINS: Record<string, DomainConfig> = {
     id: "retrieval",
     name: "Retrieval & RAG",
     description:
-      "BM25 vs embedding retrieval over AWS documentation. Quality, latency, and citation faithfulness.",
+      "BM25 vs embedding retrieval, plus an end-to-end RAG-on-Azure deployment over UK regulatory documents. Quality, latency, and citation faithfulness.",
     subtitle:
-      "BM25 baseline plus OpenAI and Google embedding adapters. Anthropic doesn't ship a public embeddings API, so it's not in the embeddings comparison.",
-    headline: "Google embeddings lead recall and nDCG; BM25 wins on cost.",
+      "Two corpora: AWS docs (BM25 baseline + 3 embedding models) and UK regulatory FCA/HMRC (rag-on-azure deployment via Azure AI Search hybrid search).",
+    headline: "Google embeddings lead recall and nDCG on AWS docs; rag-on-azure ships citation-validated answers on FCA/HMRC.",
     route: "/retrieval",
     sourceLinks: [
       {
         label: "mcp-llm-eval",
         url: "https://github.com/berkayildi/mcp-llm-eval",
+      },
+      {
+        label: "rag-on-azure",
+        url: "https://github.com/berkayildi/rag-on-azure",
       },
     ],
     subBenchmarks: [
@@ -68,6 +72,14 @@ export const DOMAINS: Record<string, DomainConfig> = {
           "Vector retrieval across 3 embedding models (OpenAI text-embedding-3-small, text-embedding-3-large, Google gemini-embedding-001). IR metrics differ per retriever because each model retrieves different chunks.",
         summaryPath: "retrieval/embeddings-summary.json",
         benchmarkPath: "retrieval/embeddings-benchmark.json",
+      },
+      {
+        id: "azure",
+        name: "rag-on-azure (FCA + HMRC)",
+        description:
+          "End-to-end production-shaped RAG on Azure (Bicep IaC + FastAPI + LangGraph) over UK regulatory documents (FCA Handbook + HMRC guidance). Multi-tenant via JWT-driven OData filters; gpt-4o + text-embedding-3-small via Azure OpenAI managed identity. Eval-gate runs on every push to main and snapshots the deployed AI Search index for evaluation.",
+        summaryPath: "retrieval/azure-summary.json",
+        benchmarkPath: "retrieval/azure-benchmark.json",
       },
     ],
   },
