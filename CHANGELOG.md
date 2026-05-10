@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.9](https://github.com/berkayildi/llmshot/compare/llmshot-v0.1.8...llmshot-v0.1.9) (2026-05-10)
+
+
+### Features
+
+* **retrieval:** add rag-on-azure subbenchmark over UK regulatory corpus ([#10](https://github.com/berkayildi/llmshot/issues/10)) ([67f6041](https://github.com/berkayildi/llmshot/commit/67f60418f741d621c73f28c5b0871ba5ba7d9254))
+
 ## [0.1.8](https://github.com/berkayildi/llmshot/compare/llmshot-v0.1.7...llmshot-v0.1.8) (2026-05-04)
 
 
